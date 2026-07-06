@@ -73,3 +73,25 @@ Custom verbs work because HTTP doesn't validate them (ties to: the requests.requ
 
 The verb is just a word in the request text — the protocol itself doesn't enforce a fixed list.
 Whether it does anything depends entirely on whether the server has code written to handle that verb — sending is trivial, meaningful handling isn't.
+
+
+
+
+
+
+########## DOTENV ########## :-
+
+
+
+python-dotenv reads key-value pairs from a .env file and can set them as environment variables.
+
+
+This way, secrets/config never get hardcoded in code (and never get pushed to GitHub,
+since .env is in .gitignore).
+
+
+.env file (plain text, key=value) -> load_dotenv() reads it and injects into os.environ -> os.getenv("KEY") pulls it back out in code.
+
+
+dotenv_values(".env") is the alternative that returns a dict without touching
+os.environ - not used here, but exists for advanced config management.
