@@ -95,3 +95,30 @@ since .env is in .gitignore).
 
 dotenv_values(".env") is the alternative that returns a dict without touching
 os.environ - not used here, but exists for advanced config management.
+
+
+
+
+
+
+########## GitHub CLI API ########## :-
+
+
+
+Simple Python script using real GitHub public api and requests library to fetch info of a username and print the fields in a structured, human readable manner.
+
+
+Flow: GET request -> check status_code -> only parse .json() if the request succeeded -> pull specific fields from the parsed dict.
+
+
+Status codes handled:
+
+- 200: success, parse and print fields (name, email, bio, public_repos,
+  followers, following)
+
+- 403: rate limit exceeded (GitHub allows 60 unauthenticated requests/hour)
+
+- else: treated as user not found (matches GitHub's 404 for missing users)
+
+
+Research method: hit https://api.github.com/users/<real-username> and https://api.github.com/users/<fake-username> directly in browser first, to see real response shapes before writing any code.
