@@ -25,5 +25,18 @@ def post_book():
     books.append(r) #adding new record
     return jsonify({"message" : "Book added successfully!"}), 201 #returning success message and status code
 
+@app.route("/books/<int:id>", methods=["PATCH"]) #decorator to register below function to update specific records...here with id...done as an extension to the url path
+def patch_book(id):
+    s = request.get_json()
+    for rec in books: #looping through list books
+        if rec["id"]==id: #checking if passed id exists in any dictionary
+            if "price" in s: #checking if the client wants to update a price field
+                rec["price"]=s["price"]
+            if "stock" in s:
+                rec["stock"]=s["stock"] #checking if the client wants to update a stock field
+            return jsonify({"message" : "Record updated successfully!"}), 200
+
+    return jsonify({"message" : "Book not found!"}), 404 #error message and code if no such id found
+
 if __name__ == "__main__": #to make sure file run only when executed directly
     app.run(debug=True) #starts server and auto reloads on updates
