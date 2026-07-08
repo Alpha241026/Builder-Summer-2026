@@ -15,15 +15,18 @@ books = [
     {"id": 10, "title": "The Girl with the Dragon Tattoo", "category": "mystery", "price": 13, "stock": 18}
 ]
 
+
 @app.route("/books",methods=["GET"]) #decorator to register below function as handler for any request hitting the url path "/books"...also note that this would've run just with the url path as @app.route defaults to handling GET
 def get_books():
     return jsonify(books) #returning dictionary in a json format when get route called from client side
+
 
 @app.route("/books", methods=["POST"]) #decorator to register below func as handler for any request creating a new book record from the url path
 def post_book():
     r = request.get_json() #converting incoming json back to Python dictionary
     books.append(r) #adding new record
     return jsonify({"message" : "Book added successfully!"}), 201 #returning success message and status code
+
 
 @app.route("/books/<int:id>", methods=["PATCH"]) #decorator to register below function to update specific records...here with id...done as an extension to the url path
 def patch_book(id):
@@ -37,6 +40,20 @@ def patch_book(id):
             return jsonify({"message" : "Record updated successfully!"}), 200
 
     return jsonify({"message" : "Book not found!"}), 404 #error message and code if no such id found
+
+
+@app.route("/books/<int:id>", methods=["DELETE"]) #decorator to register below function to delete specific records...here with id...done as an extension to the url path
+def delete_book(id):
+
+    for rec in books: #looping through list books
+        if rec["id"]==id: #checking if passed id exists in any dictionary
+            
+            books.remove(rec) #deleting the book record
+            
+            return jsonify({"message" : "Record deleted successfully!"})
+
+    return jsonify({"message" : "Book not found!"}) #error message if no such id found
+
 
 if __name__ == "__main__": #to make sure file run only when executed directly
     app.run(debug=True) #starts server and auto reloads on updates
