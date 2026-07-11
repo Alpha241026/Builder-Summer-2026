@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify #pullig in Flask class from flask package...and request & jsonify helper functions
+from flask import Flask, request, jsonify #pulling in Flask class from flask package...and request & jsonify helper functions
 
 app = Flask(__name__) #boilerplate for creating actual app instance
 
@@ -54,6 +54,31 @@ def delete_book(id):
 
     return jsonify({"message" : "Book not found!"}) #error message if no such id found
 
+
+@app.route("/books", methods = ["QUERY"]) #decorator to register below function as a custom handler for a mock implementation of the new QUERY method; get but with a body like post to support advanced filtering
+def query_book():
+    filters = request.get_json() #accepting the user filters
+    result = [] #empty list to store result to be sent back
+
+    for book in books:
+        matches = True #every check is kept True by default unless it fails and is skipped after being made False
+
+        if "category" in filters and book["category"] != filters["category"]:
+            matches = False
+            
+        if "min_price" in filters and book["price"] < filters["min_price"]:
+            matches = False
+
+        if "max_price" in filters and book["price"] > filters["max_price"]:
+            matches = False
+            
+        if "min_stock" in filters and book["stock"] < filters["min_stock"]:
+            matches = False
+
+        if matches:
+            result.append(book) #result added after it passes the check
+
+    return jsonify(result), 200 #returning success message
 
 if __name__ == "__main__": #to make sure file run only when executed directly
     app.run(debug=True) #starts server and auto reloads on updates

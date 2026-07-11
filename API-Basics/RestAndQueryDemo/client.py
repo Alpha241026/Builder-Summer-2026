@@ -78,3 +78,35 @@ elif choice=="n":
     pass
 else:
     print("Invalid input !")
+
+
+
+choice = input("Do you want to search books by filter ? (y/n)\n")
+
+if choice=="y":
+    category = input("Enter category to filter by (leave blank to skip): ")
+    min_price = input("Enter minimum price (leave blank to skip): ")
+    max_price = input("Enter maximum price (leave blank to skip): ")
+    min_stock = input("Enter minimum stock (leave blank to skip): ")
+
+    my_filters = {}
+    if category:
+        my_filters["category"] = category
+    if min_price:
+        my_filters["min_price"] = int(min_price)
+    if max_price:
+        my_filters["max_price"] = int(max_price)
+    if min_stock:
+        my_filters["min_stock"] = int(min_stock)
+
+    r = requests.request("QUERY", "http://127.0.0.1:5000/books", json=my_filters) #filtering books via RFC 10008's QUERY method - sent manually through requests.request() since no requests.query() shortcut exists yet
+
+    if r.status_code==200:
+        print(r.json())
+    else:
+        print("Query failed!")
+
+elif choice=="n":
+    pass
+else:
+    print("Invalid input !")
