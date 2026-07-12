@@ -122,3 +122,61 @@ Status codes handled:
 
 
 Research method: hit https://api.github.com/users/<real-username> and https://api.github.com/users/<fake-username> directly in browser first, to see real response shapes before writing any code.
+
+
+
+
+
+
+########## Full REST API - Client + Flask Server ########### :-
+
+
+
+Flask is the server-side mirror of requests - instead of building outbound requests, you register handlers that wait and react to incoming ones.
+
+
+Core pattern: @app.route(path, methods=[...]) + a function = "when a request matching this path+verb arrives, run this code and return its result as the response body." jsonify() converts Python dicts/lists into JSON responses -
+the server-side mirror of .json() parsing on the client.
+
+
+Data is a plain in-memory Python list of dicts (no database) - resets on every server restart, which also happens automatically on every file save because of debug=True. Real persistence will come with PostgreSQL (Phase II).
+
+
+Verbs implemented (flask_server.py), each its own route+function on /books (or /books/<int:id> where a specific record is targeted):
+
+- GET /books - returns the full list via jsonify(books)
+- POST /books - reads request.get_json(), appends new record, returns 201
+- PATCH /books/<id> - loops to find matching id, updates only fields present
+  in the incoming body (checked via "field" in data before assigning) -
+  true partial update, not a full overwrite like PUT would be
+- DELETE /books/<id> - loops to find matching id, books.remove(rec), returns
+  confirmation or 404 if not found
+- QUERY /books - custom/experimental method (mentioned below)
+
+
+Status codes used: 200 (success/read), 201 (created), 404 (not found).
+4xx = client's fault, 5xx = server's fault, 2xx = success - same category system from the requests notes, now used from the server side.
+
+
+Known limitations (noted honestly, not fixed - out of scope for this demo):
+
+- No schema validation on POST body (a malformed request would still get
+  appended as-is)
+- Server assigns nothing automatically; client computes next id via
+  max(existing ids)+1 before POSTing
+
+
+
+---- QUERY method (RFC 10008) ----
+
+RFC 10008, published June 2026, defines QUERY as a new HTTP method - the first new standard method since PATCH in 2010. It's "GET with a body":
+safe and idempotent like GET (read-only, no side effects, repeatable), but carries a JSON body like POST - solving the real problem where complex filters don't fit cleanly in a URL query string, without falsely implying a write operation the way POST-for-search does.
+
+As of writing, no major public API implements QUERY server-side yet, so this demo builds BOTH sides - a Flask server that manually registers the QUERY method, and a client that sends it - to prove the full round trip, rather than pretending to hit a live implementation that doesn't exist.
+
+Server: registering a custom/new verb is no different from any other - methods=["QUERY"] works exactly like methods=["GET"] would, since Flask/ Werkzeug don't restrict method names to a fixed list (same lesson as requests' Custom Verbs section, now from the server side).
+
+Filtering logic: loops through books, sets a per-book "matches" flag, independently checked (not chained if/elif) against each optional filter key (category, min_price, max_price, min_stock) - order-independent, easy to extend with more filters later, and "in filters" checks mean a
+missing filter key never wrongly disqualifies a book.
+
+Client: requests has no .query() shortcut (library predates the RFC), so the general-purpose requests.request("QUERY", url, json=filters) is used instead - the same underlying function .get()/.post()/etc. all wrap around, just called directly with the verb as a string argument.
