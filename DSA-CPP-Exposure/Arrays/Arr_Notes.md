@@ -23,3 +23,26 @@ Whenever a valid element is found, place it at the next position of the maintain
 Time: O(n) — Every element is explored exactly once.
 
 Space: O(1) — Only constant extra variables/pointers are used.
+
+
+
+
+
+Pattern:
+Running Sum / Dynamic Programming (State Transition)
+
+Recognition:
+Need to find the maximum/minimum value of a contiguous subarray or make an optimal decision while traversing once.
+
+Core Idea:
+Maintain the best subarray sum ending at the current index (local state).
+At each element, there are only two legal choices:
+• Start a new subarray from the current element.
+• Extend the best subarray ending at the previous index.
+Also maintain the best answer seen anywhere (global state).
+
+Time:
+O(n) — One pass through the array.
+
+Space:
+O(1) — Only constant extra variables are used.
