@@ -1,4 +1,4 @@
-/* creating tables */
+/* creating tables ... and later refining the design */
 
 
 CREATE TABLE categories (
@@ -28,3 +28,14 @@ CREATE TABLE borrow_records (
     borrow_date DATE NOT NULL DEFAULT CURRENT_DATE,
     return_date DATE
 );
+
+
+
+ALTER TABLE books ADD CONSTRAINT price_positive CHECK (price > 0);
+
+CREATE VIEW book_details AS
+SELECT books.title, categories.name AS category, books.price, books.stock
+FROM books
+JOIN categories ON books.category_id = categories.id;
+
+CREATE INDEX idx_books_category ON books(category_id);
