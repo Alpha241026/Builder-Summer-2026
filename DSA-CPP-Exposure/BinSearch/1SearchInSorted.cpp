@@ -32,7 +32,6 @@ int main() {
         else
             u = mid-1;
 
-        
     }
 
     if(found==1)
