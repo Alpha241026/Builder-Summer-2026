@@ -25,3 +25,12 @@ FROM borrow_records
 JOIN borrowers ON borrow_records.borrower_id = borrowers.id
 GROUP BY borrowers.name
 HAVING COUNT(*) > 1;
+
+
+SELECT title FROM books
+WHERE category_id = (SELECT id FROM categories WHERE name = 'scifi');
+
+
+SELECT title, price, category_id,
+    RANK() OVER (PARTITION BY category_id ORDER BY price DESC) AS price_rank
+FROM books;
