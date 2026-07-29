@@ -61,3 +61,13 @@ alter table t add constraint name check (...) - modifies an existing table.
 create view name as (select ...) - saves a query under a name, queryable like a table. No data copy - re-runs live each time.
 
 create index on table(col) - speeds up lookups on that column at scale; no visible effect on small tables.
+
+(subquery) - a query nested inside another, runs first, its result feeds the outer query. Useful for looking things up by name instead of manually finding the id first.
+
+begin / commit / rollback - groups multiple changes into one all-or-nothing unit.
+rollback undoes everything since begin, as if it never happened;
+commit makes it permanent. Real value: undoing a partial multi-step change if something fails midway (e.g. Go updating stock + logging a borrow record, second step fails - rollback undoes the first too).
+
+acid - atomic (all-or-nothing), consistent (never leaves a broken state), isolated (concurrent transactions don't interfere), durable (committed = survives a crash). Exposure only, not deep theory.
+
+window function (over, partition by) - like group by but keeps every row visible instead of collapsing into one row per group. partition by splits into groups; the calculation (e.g. RANK()) runs per row within each group.
